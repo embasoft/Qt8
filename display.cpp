@@ -1,6 +1,6 @@
 #include "display.h"
 
-Display::Display()
+Display::Display(QWidget *parent) : QGraphicsView(parent)
 {
 
 }
