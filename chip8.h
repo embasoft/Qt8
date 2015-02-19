@@ -31,6 +31,8 @@ public:
 
     void initialize();
     bool loadGame(QString path);
+    void startEmulation();
+    void stopEmulation();
     void emulateCycle();
     void decodeOpCode();
     void setKeys();
@@ -43,11 +45,16 @@ public:
     bool running() const;
     void setRunning(bool running);
 
+    QTimer *getDelayTimer() const;
+    void setDelayTimer(QTimer *value);
+
 private:
+    int _opcodes;
     bool _drawFlag;
     bool _running = false;
     QTimer *delayTimer;
     QTimer *soundTimer;
+    QTimer *drawTimer;
     short opcodeX();
     short opcodeY();
     short opcodeN();
@@ -59,8 +66,10 @@ private:
 signals:
     void resultReady(const QString &s);
     void drawScreen();
+
 public slots:
     void updateDelayTimer();
+    void drawGraphics();
 };
 
 #endif // CHIP8_H

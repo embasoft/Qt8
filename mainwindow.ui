@@ -9,26 +9,31 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>652</width>
-    <height>332</height>
+    <width>676</width>
+    <height>412</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QHBoxLayout" name="horizontalLayout">
-    <item>
-     <widget class="Display" name="graphicsView"/>
-    </item>
-   </layout>
+   <widget class="Display" name="graphicsView">
+    <property name="geometry">
+     <rect>
+      <x>6</x>
+      <y>6</y>
+      <width>664</width>
+      <height>324</height>
+     </rect>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>652</width>
+     <width>676</width>
      <height>27</height>
     </rect>
    </property>

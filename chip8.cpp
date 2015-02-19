@@ -1,9 +1,12 @@
 #include "chip8.h"
+#include <QDebug>
 
 Chip8::Chip8(QObject *parent) : QThread(parent)
 {
     delayTimer = new QTimer(this);
     connect(delayTimer, &QTimer::timeout, this, &Chip8::updateDelayTimer);
+    drawTimer = new QTimer(this);
+    //connect(drawTimer, &QTimer::timeout, this, &Chip8::drawGraphics);
 }
 
 Chip8::~Chip8()
@@ -13,9 +16,13 @@ Chip8::~Chip8()
 
 void Chip8::run()
 {
-    delayTimer->start(1000);
     while (running())
     {
+        if (QThread::currentThread()->isInterruptionRequested())
+        {
+            return;
+        }
+
         emulateCycle();
 
         if (drawFlag())
@@ -23,7 +30,6 @@ void Chip8::run()
 
         setKeys();
     }
-    delayTimer->stop();
 }
 
 void Chip8::initialize()
@@ -90,6 +96,21 @@ bool Chip8::loadGame(QString path)
     return true;
 }
 
+void Chip8::startEmulation()
+{
+    setRunning(true);
+    delayTimer->start(1000);
+    start();
+    drawTimer->start(16);
+}
+
+void Chip8::stopEmulation()
+{
+    setRunning(false);
+    delayTimer->stop();
+    drawTimer->stop();
+}
+
 void Chip8::emulateCycle()
 {
     // fetch opcode
@@ -107,6 +128,8 @@ void Chip8::emulateCycle()
 //            printf("BEEP!\n");
         sound_timer--;
     }
+    usleep(1667);
+    _opcodes++;
 }
 
 void Chip8::decodeOpCode()
@@ -121,8 +144,7 @@ void Chip8::decodeOpCode()
                 gfx[i] = 0x0;
             break;
         case 0x00EE: // 00EE | Return from a subroutine
-            pc = stack[sp];
-            sp--;
+            pc = stack[--sp];
             break;
         }
         break;
@@ -130,8 +152,7 @@ void Chip8::decodeOpCode()
         pc = opcodeNNN();
         break;
     case 0x2000: // 2NNN | Calls subroutine at NNN
-        stack[sp] = pc;
-        sp++;
+        stack[sp++] = pc + 2;
         pc = opcodeNNN();
         break;
     case 0x3000: // 3XNN | Skips the next instruction if VX equals NN
@@ -369,6 +390,16 @@ void Chip8::setRunning(bool running)
 {
     _running = running;
 }
+QTimer *Chip8::getDelayTimer() const
+{
+    return delayTimer;
+}
+
+void Chip8::setDelayTimer(QTimer *value)
+{
+    delayTimer = value;
+}
+
 
 inline short Chip8::opcodeX()
 {
@@ -411,6 +442,21 @@ void Chip8::updateDelayTimer()
     {
         delay_timer--;
     }
+}
+
+void Chip8::drawGraphics()
+{
+    if (drawFlag())
+    {
+        requestInterruption();
+        if (wait())
+        {
+            emit drawScreen();
+        }
+    }
+    qDebug() << QString::number(_opcodes);
+    _opcodes = 0;
+    start();
 }
 
 

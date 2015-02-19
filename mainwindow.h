@@ -4,6 +4,7 @@
 #include "chip8.h"
 #include <QGraphicsView>
 #include <QGraphicsScene>
+#include <QGraphicsPixmapItem>
 #include <QPainter>
 #include <QPixmap>
 #include <QMainWindow>
@@ -35,6 +36,7 @@ private:
     Ui::MainWindow *ui;
     QGraphicsScene *scene;
     QPixmap *pixmap;
+    QGraphicsPixmapItem *pixmapItem;
     QPainter *painter;
 };
 
